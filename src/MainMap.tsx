@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
-import { LatLngTuple, Map } from 'leaflet'
+import { LatLng, Map } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 import './Map.css'
 import DisplayPosition from './DisplayPosition'
 
 function MainMap() {
-  const position: LatLngTuple = [35.68, 139.76]
+  const position = new LatLng(35.68, 139.76)
   const zoom = 13
   const [map, setMap] = useState<Map | null>(null)
 
