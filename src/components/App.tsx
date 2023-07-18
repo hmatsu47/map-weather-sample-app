@@ -1,11 +1,9 @@
-import MainMap from './MainMap.tsx'
+import { MainMap } from './MainMap.tsx'
 
-function App() {
+export function App() {
   return (
     <div className="App">
       <MainMap />
     </div>
   )
 }
-
-export default App
