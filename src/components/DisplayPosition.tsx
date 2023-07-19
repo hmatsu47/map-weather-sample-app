@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LatLng, Map } from 'leaflet'
+import { fetchAddress } from '../api/fetchAddress'
 import { fetchWeatherData } from '../api/fetchWeatherData'
 import {
   getWeatherIcon,
@@ -19,6 +20,8 @@ export function DisplayPosition(props: Props) {
   }
   // 地図の中心座標（緯度・軽度）
   const [position, setPosition] = useState(() => map.getCenter())
+  // 現在地の住所
+  const [address, setAddress] = useState<string | null>(null)
   // 現在天気の表示項目
   const [weatherCode, setWeatherCode] = useState<number | null>(null)
   const [temperature, setTemperature] = useState<number | null>(null)
@@ -36,23 +39,28 @@ export function DisplayPosition(props: Props) {
       map.off('moveend', onMoveEnd)
     }
   }, [map, onMoveEnd])
-  // 地図の中心座標が変更されたらその場所の現在転記をOpen-MeteoのAPIで取得
+  // 地図の中心座標が変更されたらその場所の住所を国土地理院のAPIで取得し、現在の天気をOpen-MeteoのAPIで取得
   useEffect(() => {
     const currentTime = new Date().getTime()
     const timeDiff = currentTime - requestTime.current
     if (timeDiff < 1000) {
-      // 前回のAPI呼び出しから1分経過していなければAPI呼び出しをやめる（APIリクエスト負荷対策）
+      // 前回のAPI呼び出しから1秒経過していなければAPI呼び出しをやめる（APIリクエスト負荷対策）
       return
     }
     requestTime.current = currentTime
-    const load = async () => {
+    const addressLoad = async () => {
+      const address = await fetchAddress(position)
+      setAddress(address)
+    }
+    addressLoad()
+    const weatherLoad = async () => {
       const weather = await fetchWeatherData(position)
       setWeatherCode(getWeatherItem(weather, weather?.weathercode))
       setTemperature(getWeatherItem(weather, weather?.temperature))
       setWindSpeed(getWeatherItem(weather, weather?.windspeed))
       setWindDirection(getWeatherItem(weather, weather?.winddirection))
     }
-    load()
+    weatherLoad()
   }, [position])
   // ブラウザから取得した現在位置に地図の中心を移動
   function moveToCurrentPosition() {
@@ -70,7 +78,8 @@ export function DisplayPosition(props: Props) {
 
   return (
     <p>
-      緯度: {position.lat.toFixed(4)}, 経度: {position.lng.toFixed(4)}, 天気:{' '}
+      緯度: {position.lat.toFixed(4)}, 経度: {position.lng.toFixed(4)},{' '}
+      {address !== null ? `${address}の` : ''}天気:{' '}
       {weatherCode !== null ? getWeatherIcon(weatherCode) || '--' : '--'}, 気温:{' '}
       {temperature !== null ? temperature.toFixed(1) || '-.-' : '-.-'} ℃, 風:{' '}
       {windDirection !== null ? getWindDirectionName(windDirection) : ''}{' '}

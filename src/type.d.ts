@@ -17,3 +17,10 @@ export type Result = {
   error?: boolean
   reason?: string
 }
+type Muni = {
+  muniCd: string
+  lv01Nm: string
+}
+export type Address = {
+  results: Muni
+}
