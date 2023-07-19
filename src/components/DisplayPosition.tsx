@@ -71,7 +71,7 @@ export function DisplayPosition(props: Props) {
       case 2:
         return '⛅'
       case 3:
-        return '☁️'
+        return '☁'
       case 45:
       case 48:
         return '🌫'
