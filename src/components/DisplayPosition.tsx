@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Map } from 'leaflet'
+import { LatLng, Map } from 'leaflet'
 import { fetchWeatherData } from '../api/fetchWeatherData'
+import {
+  getWeatherIcon,
+  getWeatherItem,
+  getWindDirectionName
+} from '../utils/weatherUtil'
 
 type Props = {
   map: Map | null
@@ -9,109 +14,72 @@ type Props = {
 export function DisplayPosition(props: Props) {
   const map = props.map
   if (map === null) {
+    // 地図未表示→処理しない
     return null
   }
+  // 地図の中心座標（緯度・軽度）
   const [position, setPosition] = useState(() => map.getCenter())
+  // 現在天気の表示項目
   const [weatherCode, setWeatherCode] = useState<number | null>(null)
   const [temperature, setTemperature] = useState<number | null>(null)
   const [windSpeed, setWindSpeed] = useState<number | null>(null)
+  const [windDirection, setWindDirection] = useState<number | null>(null)
   const requestTime = useRef<number>(0)
-
-  const onMove = useCallback(() => {
+  // 地図のドラッグ／移動完了時に地図の中心座標を更新
+  const onMoveEnd = useCallback(() => {
     setPosition(map.getCenter())
   }, [map])
-
+  // 地図のドラッグ／移動完了イベントに対する呼び出しをセット／アンセット
   useEffect(() => {
-    map.on('move', onMove)
+    map.on('moveend', onMoveEnd)
     return () => {
-      map.off('move', onMove)
+      map.off('moveend', onMoveEnd)
     }
-  }, [map, onMove])
-
+  }, [map, onMoveEnd])
+  // 地図の中心座標が変更されたらその場所の現在転記をOpen-MeteoのAPIで取得
   useEffect(() => {
     const currentTime = new Date().getTime()
     const timeDiff = currentTime - requestTime.current
     if (timeDiff < 1000) {
+      // 前回のAPI呼び出しから1分経過していなければAPI呼び出しをやめる（APIリクエスト負荷対策）
       return
     }
     requestTime.current = currentTime
     const load = async () => {
       const weather = await fetchWeatherData(position)
-      setWeatherCode(
-        weather
-          ? weather.weathercode !== undefined
-            ? weather.weathercode
-            : null
-          : null
-      )
-      setTemperature(
-        weather
-          ? weather.temperature !== undefined
-            ? weather.temperature
-            : null
-          : null
-      )
-      setWindSpeed(
-        weather
-          ? weather.windspeed !== undefined
-            ? weather.windspeed
-            : null
-          : null
-      )
+      setWeatherCode(getWeatherItem(weather, weather?.weathercode))
+      setTemperature(getWeatherItem(weather, weather?.temperature))
+      setWindSpeed(getWeatherItem(weather, weather?.windspeed))
+      setWindDirection(getWeatherItem(weather, weather?.winddirection))
     }
     load()
   }, [position])
-
-  function weatherIcon(weatherCode: number) {
-    switch (weatherCode) {
-      case 0:
-        return '☀'
-      case 1:
-        return '🌤'
-      case 2:
-        return '⛅'
-      case 3:
-        return '☁'
-      case 45:
-      case 48:
-        return '🌫'
-      case 51:
-      case 53:
-      case 55:
-      case 56:
-      case 57:
-      case 80:
-      case 81:
-      case 82:
-        return '🌧'
-      case 61:
-      case 63:
-      case 65:
-      case 66:
-      case 67:
-        return '☔'
-      case 71:
-      case 73:
-      case 75:
-      case 77:
-      case 85:
-      case 86:
-        return '☃'
-      case 95:
-      case 96:
-      case 99:
-        return '⛈'
-      default:
-        return '--'
+  // ブラウザから取得した現在位置に地図の中心を移動
+  function moveToCurrentPosition() {
+    if (!('geolocation' in navigator) || !map) {
+      // ブラウザから位置情報が取得できなければ何もしない
+      return
     }
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords
+      const latLng = new LatLng(latitude, longitude)
+      setPosition(latLng)
+      map.panTo(latLng)
+    })
   }
 
   return (
     <p>
       緯度: {position.lat.toFixed(4)}, 経度: {position.lng.toFixed(4)}, 天気:{' '}
-      {weatherCode !== null ? weatherIcon(weatherCode) || '--' : '--'}, 気温:{' '}
-      {temperature !== null ? temperature.toFixed(1) || '-.-' : '-.-'} ℃, 風速:{' '}
+      {weatherCode !== null ? getWeatherIcon(weatherCode) || '--' : '--'}, 気温:{' '}
+      {temperature !== null ? temperature.toFixed(1) || '-.-' : '-.-'} ℃, 風:{' '}
+      {windDirection !== null ? getWindDirectionName(windDirection) : ''}{' '}
       {windSpeed !== null ? windSpeed.toFixed(1) || '-.-' : '-.-'} m/s{' '}
+      <input
+        type="button"
+        value={'現在地へ移動'}
+        onClick={moveToCurrentPosition}
+      />
     </p>
   )
 }

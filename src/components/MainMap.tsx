@@ -6,11 +6,11 @@ import { DisplayPosition } from './DisplayPosition'
 import './Map.css'
 
 export function MainMap() {
-  // 地図の中心を名古屋に
+  // 初期表示時、地図の中心を名古屋に
   const position = new LatLng(35.1815, 136.9064)
   const zoom = 13
   const [map, setMap] = useState<Map | null>(null)
-
+  // 生成した地図のrefからsetMapできるように（生成した地図はメモ化）
   const displayMap = useMemo(
     () => (
       <MapContainer center={position} zoom={zoom} ref={setMap}>
