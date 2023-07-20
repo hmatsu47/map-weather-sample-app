@@ -6,7 +6,7 @@ export const readMuniJs = async () => {
   const load = async (): Promise<Dictionary> => {
     const data: string = await getTextFile('https://maps.gsi.go.jp/js/muni.js')
     const lines = data.split('\n')
-    let dict: { [key: string]: string } = {}
+    let dict: Dictionary = {}
     lines.forEach((line) => {
       const csvLine = line.split("'")
       if (csvLine.length === 3) {
