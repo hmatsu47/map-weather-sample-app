@@ -1,18 +1,18 @@
-import { useEffect, useMemo, useState } from 'react'
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
-import { Marker as LeafletMarker, DivIcon, LatLng, Map } from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { DisplayWeather } from './DisplayWeather'
-import './Map.css'
+import { useEffect, useMemo, useState } from "react";
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { Marker as LeafletMarker, DivIcon, LatLng, Map } from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { DisplayWeather } from "./DisplayWeather";
+import "./Map.css";
 
 export function MainMap() {
   // 初期表示時、地図の中心を名古屋に
-  const position = new LatLng(35.1815, 136.9064)
-  const zoom = 13
-  const [map, setMap] = useState<Map | null>(null)
+  const position = new LatLng(35.1815, 136.9064);
+  const zoom = 13;
+  const [map, setMap] = useState<Map | null>(null);
   // 地図の中心（十字マーク）
-  const [mark, setMark] = useState<LeafletMarker<DivIcon> | null>(null)
-  const cross = new DivIcon({ className: 'cross', bgPos: [18, 18] })
+  const [mark, setMark] = useState<LeafletMarker<DivIcon> | null>(null);
+  const cross = new DivIcon({ className: "cross", bgPos: [18, 18] });
   // 生成した地図のrefからsetMapできるように（生成した地図はメモ化）
   const displayMap = useMemo(
     () => (
@@ -31,17 +31,17 @@ export function MainMap() {
       </MapContainer>
     ),
     []
-  )
+  );
   // 十字マークを地図の中心に表示し続ける
   useEffect(() => {
     if (!map || !mark) {
-      return
+      return;
     }
-    map.on('move', function () {
+    map.on("move", function () {
       // mousemoveイベントでマーカを移動
-      mark.setLatLng(map.getCenter())
-    })
-  }, [map])
+      mark.setLatLng(map.getCenter());
+    });
+  }, [map]);
 
   if (!map) {
     return (
@@ -49,12 +49,12 @@ export function MainMap() {
         <p>Loading...</p>
         {displayMap}
       </div>
-    )
+    );
   }
   return (
     <div>
       <DisplayWeather map={map} />
       {displayMap}
     </div>
-  )
+  );
 }

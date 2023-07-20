@@ -1,12 +1,8 @@
-export const fetchWithTimeout = async (
-  method: string,
-  url: string,
-  object?: Object
-) => {
-  const controller = new AbortController()
+export const fetchWithTimeout = async (method: string, url: string, object?: Object) => {
+  const controller = new AbortController();
   const timeout = setTimeout(() => {
-    controller.abort()
-  }, 10000)
+    controller.abort();
+  }, 10000);
 
   try {
     const request = object
@@ -14,23 +10,23 @@ export const fetchWithTimeout = async (
           // object の指定があれば body に JSON 形式でセットしてリクエスト
           method: method,
           headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json;charset=utf8'
+            Accept: "application/json",
+            "Content-Type": "application/json;charset=utf8",
           },
           body: JSON.stringify(object),
-          signal: controller.signal
+          signal: controller.signal,
         }
       : {
           // なければ body なしでリクエスト
           method: method,
-          signal: controller.signal
-        }
-    const response = await fetch(url, request)
+          signal: controller.signal,
+        };
+    const response = await fetch(url, request);
     if (!response.ok) {
-      throw new Error(response.statusText)
+      throw new Error(response.statusText);
     }
-    return response
+    return response;
   } finally {
-    clearTimeout(timeout)
+    clearTimeout(timeout);
   }
-}
+};

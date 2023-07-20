@@ -3,12 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "extends": [
-    "airbnb",
-    "airbnb-typescript",
-    "airbnb/hooks",
-    "standard-with-typescript"
-  ],
+  "extends": ["airbnb", "airbnb-typescript", "airbnb/hooks", "standard-with-typescript"],
   "overrides": [],
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -59,15 +54,7 @@
       "error",
       {
         // グループ毎の並び順
-        "groups": [
-          "builtin",
-          "external",
-          "parent",
-          "sibling",
-          "index",
-          "object",
-          "type"
-        ],
+        "groups": ["builtin", "external", "parent", "sibling", "index", "object", "type"],
         // グループ毎に改行
         "newlines-between": "always",
         "pathGroupsExcludedImportTypes": ["builtin"],
@@ -88,10 +75,7 @@
       }
     ],
     // 型情報しか使ってないimportをimport typeに強制
-    "@typescript-eslint/consistent-type-imports": [
-      "error",
-      { "prefer": "type-imports" }
-    ],
+    "@typescript-eslint/consistent-type-imports": ["error", { "prefer": "type-imports" }],
     //jsx形式のファイル拡張子をjsxもしくはtsxに限定
     "react/jsx-filename-extension": [
       "error",
