@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
 import { LatLng, Map } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { DisplayPosition } from './DisplayPosition'
+import { DisplayWeather } from './DisplayWeather'
 import './Map.css'
 
 export function MainMap() {
@@ -25,7 +25,7 @@ export function MainMap() {
 
   return (
     <div>
-      {map ? <DisplayPosition map={map} /> : ''}
+      {map ? <DisplayWeather map={map} /> : ''}
       {displayMap}
     </div>
   )

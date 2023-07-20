@@ -1,19 +1,18 @@
 import { getApiData } from '../api/apiHandler'
 import { LatLng } from 'leaflet'
-import { Weather, Result } from '../type'
+import { Weather, WeatherResult } from '../type'
 
 export const fetchWeatherData = async (position: LatLng) => {
-  const load = async (position: LatLng): Promise<Weather | null> => {
-    const data: Result = await getApiData(
+  const load = async (): Promise<Weather | null> => {
+    const data: WeatherResult = await getApiData(
       `https://api.open-meteo.com/v1/forecast?latitude=${position.lat}&longitude=${position.lng}&current_weather=true&windspeed_unit=ms`
     )
-    const result = data as Result
-    const weather = result
-      ? result.current_weather
-        ? (result.current_weather as Weather)
+    const weather = data
+      ? data.current_weather
+        ? data.current_weather
         : null
       : null
     return weather
   }
-  return load(position)
+  return load()
 }

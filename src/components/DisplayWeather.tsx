@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDidMount } from 'rooks'
 import { LatLng, Map } from 'leaflet'
 import { fetchAddress } from '../api/fetchAddress'
 import { fetchWeatherData } from '../api/fetchWeatherData'
+import { readMuniJs } from '../api/readMuniJs'
 import {
   getWeatherIcon,
   getWeatherItem,
   getWindDirectionName
 } from '../utils/weatherUtil'
+import { Dictionary } from '../type'
 
 type Props = {
   map: Map | null
 }
 
-export function DisplayPosition(props: Props) {
+export function DisplayWeather(props: Props) {
   const map = props.map
   if (map === null) {
     // 地図未表示→処理しない
@@ -20,8 +23,11 @@ export function DisplayPosition(props: Props) {
   }
   // 地図の中心座標（緯度・軽度）
   const [position, setPosition] = useState(() => map.getCenter())
+  // 市区町村コード
+  const [muniDict, setMuniDict] = useState<Dictionary | null>(null)
   // 現在地の住所
-  const [address, setAddress] = useState<string | null>(null)
+  const [addressMuniCode, setAddressMuniCode] = useState<string | null>(null)
+  const [addressDetail, setAddressDetail] = useState<string | null>(null)
   // 現在天気の表示項目
   const [weatherCode, setWeatherCode] = useState<number | null>(null)
   const [temperature, setTemperature] = useState<number | null>(null)
@@ -50,7 +56,8 @@ export function DisplayPosition(props: Props) {
     requestTime.current = currentTime
     const addressLoad = async () => {
       const address = await fetchAddress(position)
-      setAddress(address)
+      setAddressMuniCode(address.muniCd)
+      setAddressDetail(address.lv01Nm)
     }
     addressLoad()
     const weatherLoad = async () => {
@@ -62,6 +69,11 @@ export function DisplayPosition(props: Props) {
     }
     weatherLoad()
   }, [position])
+  // 地図ロード時に市区町村コードファイルを取得
+  useDidMount(async () => {
+    const muni = await readMuniJs()
+    setMuniDict(muni)
+  })
   // ブラウザから取得した現在位置に地図の中心を移動
   function moveToCurrentPosition() {
     if (!('geolocation' in navigator) || !map) {
@@ -78,10 +90,13 @@ export function DisplayPosition(props: Props) {
 
   return (
     <p>
-      緯度: {position.lat.toFixed(4)}, 経度: {position.lng.toFixed(4)},{' '}
-      {address !== null ? `${address}の` : ''}天気:{' '}
-      {weatherCode !== null ? getWeatherIcon(weatherCode) || '--' : '--'}, 気温:{' '}
-      {temperature !== null ? temperature.toFixed(1) || '-.-' : '-.-'} ℃, 風:{' '}
+      {/* 緯度: {position.lat.toFixed(4)}, 経度: {position.lng.toFixed(4)} ・{' '} */}
+      {muniDict && addressMuniCode && addressDetail
+        ? `${muniDict[addressMuniCode]}${addressDetail}の`
+        : ''}
+      天気: {weatherCode !== null ? getWeatherIcon(weatherCode) || '--' : '--'}{' '}
+      ・ 気温: {temperature !== null ? temperature.toFixed(1) || '-.-' : '-.-'}{' '}
+      ℃ ・ 風:{' '}
       {windDirection !== null ? getWindDirectionName(windDirection) : ''}{' '}
       {windSpeed !== null ? windSpeed.toFixed(1) || '-.-' : '-.-'} m/s{' '}
       <input

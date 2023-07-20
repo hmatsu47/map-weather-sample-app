@@ -53,27 +53,28 @@ export function getWeatherItem(
   return weather ? (item !== undefined ? item : null) : null
 }
 
-const windDirectionPattern = [
-  '北',
-  '北北東',
-  '北東',
-  '東北東',
-  '東',
-  '東南東',
-  '南東',
-  '南南東',
-  '南',
-  '南南西',
-  '南西',
-  '西南西',
-  '西',
-  '西北西',
-  '北西',
-  '北北西'
-]
-
 // 風向を角度から16方位に変換
 export function getWindDirectionName(windDirection: number) {
+  const windDirectionPattern = [
+    '北',
+    '北北東',
+    '北東',
+    '東北東',
+    '東',
+    '東南東',
+    '南東',
+    '南南東',
+    '南',
+    '南南西',
+    '南西',
+    '西南西',
+    '西',
+    '西北西',
+    '北西',
+    '北北西'
+  ]
+  const direction16 = 360 / 16
+  const direction16Half = direction16 / 2
   if (windDirection < 0 || 360 <= windDirection) {
     return ''
   }
@@ -82,9 +83,9 @@ export function getWindDirectionName(windDirection: number) {
     return '無風'
   }
   const windDirectionCode = Math.floor(
-    (windDirection < 360 - 11.25
-      ? windDirection + 11.25
-      : windDirection - (360 - 11.25)) / 22.5
+    (windDirection < 360 - direction16Half
+      ? windDirection + direction16Half
+      : windDirection - (360 - direction16Half)) / direction16
   )
   return windDirectionPattern[windDirectionCode]
 }

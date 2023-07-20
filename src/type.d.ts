@@ -5,7 +5,7 @@ export type Weather = {
   weathercode?: number
   time?: string
 }
-export type Result = {
+export type WeatherResult = {
   latitude?: number
   longitude?: number
   generationtime_ms?: number
@@ -17,10 +17,11 @@ export type Result = {
   error?: boolean
   reason?: string
 }
-type Muni = {
+export type Address = {
   muniCd: string
   lv01Nm: string
 }
-export type Address = {
-  results: Muni
+export type AddressResult = {
+  results: Address
 }
+export type Dictionary = { [key: string]: string }
