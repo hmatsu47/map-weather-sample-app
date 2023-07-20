@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDidMount } from 'rooks'
 import { LatLng, Map } from 'leaflet'
 import { fetchAddress } from '../api/fetchAddress'
@@ -33,7 +33,6 @@ export function DisplayWeather(props: Props) {
   const [temperature, setTemperature] = useState<number | null>(null)
   const [windSpeed, setWindSpeed] = useState<number | null>(null)
   const [windDirection, setWindDirection] = useState<number | null>(null)
-  const requestTime = useRef<number>(0)
   // 地図のドラッグ／移動完了時に地図の中心座標を更新
   const onMoveEnd = useCallback(() => {
     setPosition(map.getCenter())
@@ -47,13 +46,6 @@ export function DisplayWeather(props: Props) {
   }, [map, onMoveEnd])
   // 地図の中心座標が変更されたらその場所の住所を国土地理院のAPIで取得し、現在の天気をOpen-MeteoのAPIで取得
   useEffect(() => {
-    const currentTime = new Date().getTime()
-    const timeDiff = currentTime - requestTime.current
-    if (timeDiff < 1000) {
-      // 前回のAPI呼び出しから1秒経過していなければAPI呼び出しをやめる（APIリクエスト負荷対策）
-      return
-    }
-    requestTime.current = currentTime
     const addressLoad = async () => {
       const address = await fetchAddress(position)
       setAddressMuniCode(address.muniCd)
