@@ -24,7 +24,12 @@ export function MainMap() {
   )
 
   if (!map) {
-    return <div>Loading...</div>
+    return (
+      <div>
+        <p>Loading...</p>
+        {displayMap}
+      </div>
+    )
   }
   return (
     <div>
