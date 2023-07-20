@@ -23,9 +23,12 @@ export function MainMap() {
     []
   )
 
+  if (!map) {
+    return <div>Loading...</div>
+  }
   return (
     <div>
-      {map ? <DisplayWeather map={map} /> : ''}
+      <DisplayWeather map={map} />
       {displayMap}
     </div>
   )

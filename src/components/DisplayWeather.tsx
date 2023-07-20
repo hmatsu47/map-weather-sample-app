@@ -12,15 +12,11 @@ import {
 import { Dictionary } from '../type'
 
 type Props = {
-  map: Map | null
+  map: Map
 }
 
 export function DisplayWeather(props: Props) {
   const map = props.map
-  if (map === null) {
-    // 地図未表示→処理しない
-    return null
-  }
   // 地図の中心座標（緯度・軽度）
   const [position, setPosition] = useState(() => map.getCenter())
   // 市区町村コード
