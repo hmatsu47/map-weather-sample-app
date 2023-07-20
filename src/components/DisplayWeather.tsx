@@ -80,7 +80,9 @@ export function DisplayWeather(props: Props) {
     <p>
       {/* 緯度: {position.lat.toFixed(4)}, 経度: {position.lng.toFixed(4)} ・{' '} */}
       {muniDict && addressMuniCode && addressDetail
-        ? `${muniDict[addressMuniCode]}${addressDetail}の`
+        ? `${muniDict[addressMuniCode]}${
+            addressDetail !== '－' ? addressDetail : ''
+          }の`
         : ''}
       天気: {weatherCode !== null ? getWeatherIcon(weatherCode) || '--' : '--'}{' '}
       ・ 気温: {temperature !== null ? temperature.toFixed(1) || '-.-' : '-.-'}{' '}
