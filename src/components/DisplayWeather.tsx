@@ -15,7 +15,7 @@ export function DisplayWeather(props: Props) {
   const map = props.map;
   // 地図の中心座標（緯度・軽度）
   const [position, setPosition] = useState(() => map.getCenter());
-  // 市区町村コード
+  // 市区町村コード→市区町村（名）変換辞書（国土交通省のmuni.jsを連想配列化）
   const [muniDict, setMuniDict] = useState<Dictionary | null>(null);
   // 現在地の住所
   const [addressMuniCode, setAddressMuniCode] = useState<string | null>(null);
@@ -32,6 +32,7 @@ export function DisplayWeather(props: Props) {
   // 地図のドラッグ／移動完了イベントに対する呼び出しをセット／アンセット
   useEffect(() => {
     map.on("moveend", onMoveEnd);
+    // DOMアンマウント時にアンセット
     return () => {
       map.off("moveend", onMoveEnd);
     };
