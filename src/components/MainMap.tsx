@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import { Marker as LeafletMarker, DivIcon, LatLng, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -32,16 +32,21 @@ export function MainMap() {
     ),
     []
   );
-  // 十字マークを地図の中心に表示し続ける
+  // 十字マークを地図の中心に表示し続ける（mousemoveイベントでマーカを移動）
+  const onMove = useCallback(() => {
+    mark!.setLatLng(map!.getCenter());
+  }, [map, mark]);
+  // 地図のドラッグ／移動イベントに対する呼び出しをセット／アンセット
   useEffect(() => {
     if (!map || !mark) {
       return;
     }
-    map.on("move", function () {
-      // mousemoveイベントでマーカを移動
-      mark.setLatLng(map.getCenter());
-    });
-  }, [map]);
+    map.on("move", onMove);
+    // DOMアンマウント時にアンセット
+    return () => {
+      map.off("move", onMove);
+    };
+  }, [map, mark, onMove]);
 
   if (!map) {
     return (
